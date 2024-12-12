@@ -11,7 +11,9 @@ const auteur = document.getElementById("author");
 const myForm = document.getElementById("formulaire");
 
 // form modifier
-const formulaireModifier = document.querySelector("#formModifier");
+const formulaireModifier = document.querySelector("#formeModifier");
+console.log(formulaireModifier);
+
 const titreModif = document.querySelector("#titleModif");
 const contenuModif = document.querySelector("#contentModif");
 const auteurModif = document.getElementById("authorModif");
@@ -37,8 +39,9 @@ formulaire.addEventListener("submit", (e) => {
     e.preventDefault();
 
     // appell de notre fonction 
-    ajouterArticle(titre.value, contenu.value, auteur.value)
     sauvgarderArticle(titre.value, contenu.value, auteur.value)
+    // ajouterArticle(titre.value, contenu.value, auteur.value)
+    recupererArticle();
     myForm.reset();
 })
 
@@ -51,18 +54,19 @@ EnregistrerModif.addEventListener("click", () => {
 })
 // fonction pour ajouter un article
 
-function ajouterArticle(titre,contenu,auteur){
+function ajouterArticle(titre,contenu,auteur,id){
     // creation des elements
-
     const div = document.createElement('div')
+    div.setAttribute('data-id', id);
     listeTask.appendChild(div)
+
+    // titre
 const li1 = document.createElement('li')
 div.appendChild(li1)
-
-// titre
-
 li1.innerHTML = ` <strong>Titre:</strong> <br> ${ titre}`
 div.appendChild(li1)
+
+
 
 // contenu
 const li2 = document.createElement('li')
@@ -100,73 +104,41 @@ div.appendChild(li5)
 li5.appendChild(modifier)
 li5.classList.add('liAction')
 
-// ecouter le click sur le bouton modifier
-modifier.addEventListener("click", () => {
-    const formeModifier = document.querySelector("#formeModifier");
-    formulaire.style.display = "block";
-    pagePrincipale.style.display = "none";
-    formeModifier.style.display = "block";
-    myForm.style.display = "none";
-
-    modifierArticle(titre, contenu, auteur)
-
-})
-
-
-EnregistrerModif.addEventListener("click", () => {
-    const index = Array.from(listeTask.children).indexOf(div)
-    formulaire.style.display = "none";
-    pagePrincipale.style.display = "block";
-
-    // ajout des nouvelles elements
-    li1.innerHTML = ` <strong>Titre:</strong> <br> ${ titreModif.value}`
-    li2.innerHTML =`<strong>Contenu:</strong> <br> ${contenuModif.value}`
-    li3.innerHTML =`<strong>Auteur:</strong> <br> ${auteurModif.value}`
-    
-    supprimerArticle(index)
-    sauvgarderArticle(titreModif.value, contenuModif.value, auteurModif.value)
-  
-    
-})
-
-
 // supprimer
 const supp = document.createElement('span')
 supp.innerHTML = `<i class="fa fa-trash"></i>`
 li5.appendChild(supp)
 
-// ecouter le click sur le bouton supprimer
-supp.addEventListener("click", () => {
-
-    const index = Array.from(listeTask.children).indexOf(div)
-    supprimerArticle(index)
-    div.remove()
-})
+// gestionnaires des evennements
+modifier.addEventListener("click", () => afficherFormModifier(id))
+supp.addEventListener('click', () => supprimerArticle(id,div))
 
 
 }
 
 
-// fonction sauvgarder
-function sauvgarderArticle(titre,contenu,auteur){
-    let article = {
+// sauvegarder article
+function sauvgarderArticle(titre, contenu, auteur) {
+    const article = {
+        id: Date.now(), 
         titre: titre,
         contenu: contenu,
         auteur: auteur
-    }
-    let save = JSON.parse(localStorage.getItem("article")) || []
-    save.push(article)
-    localStorage.setItem("article", JSON.stringify(save))
-
+    };
+    let save = JSON.parse(localStorage.getItem("article")) || [];
+    save.push(article);
+    localStorage.setItem("article", JSON.stringify(save));
 }
+
 
 // fonction de recuperation 
 function recupererArticle(){
     let save = JSON.parse(localStorage.getItem("article")) || []
 
     listeTask.innerHTML = ""
+
     save.forEach(article => {
-        ajouterArticle(article.titre, article.contenu, article.auteur)
+        ajouterArticle(article.titre, article.contenu, article.auteur, article.id)
     });
 }
 
@@ -174,35 +146,62 @@ recupererArticle()
 
 // fonction modifier
 
-function modifierArticle(titremodifier,contenumodifier,auteurmodifier){
+function modifierArticle(id,titremodifier,contenumodifier,auteurmodifier){
     let save = JSON.parse(localStorage.getItem("article")) || []
 
-    let index = save.findIndex(article=> article.titre === titremodifier)
+    let index = save.findIndex(article=> article.id === id)
 
     if(index !== -1){
         save[index] ={
+
+            //copier l'index
+            ...save[index],
             titre: titremodifier,
             contenu: contenumodifier,
             auteur: auteurmodifier
         }
+        localStorage.setItem("article", JSON.stringify(save))
     }
    
-    localStorage.setItem("article", JSON.stringify(save))
-
-   titreModif.value = save[index].titre
-   contenuModif.value = save[index].contenu
-   auteurModif.value = save[index].auteur
 
 }
 
+// fonction afficher formulaire
 
+function afficherFormModifier(id){
+    let save = JSON.parse(localStorage.getItem("article")) || []
+    const article = save.find(article => article.id === id)
+
+    if(article){
+        titreModif.value = article.titre
+        contenuModif.value = article.contenu
+        auteurModif.value = article.auteur
+
+        pagePrincipale.style.display = "none";
+        formulaire.style.display = "block";
+        formulaireModifier.style.display = "block";
+        console.log(formulaireModifier);
+        
+        myForm.style.display = "none";
+
+        // enregistrement des modifications
+        EnregistrerModif.onclick = () => {
+            modifierArticle(id, titreModif.value, contenuModif.value, auteurModif.value);
+            recupererArticle(); 
+            formulaire.style.display = "none";
+            pagePrincipale.style.display = "block";
+        };
+    }
+
+}
 
 // fonction supprimer
 
-function supprimerArticle(supprimer){
+function supprimerArticle(id,div){
     let save = JSON.parse(localStorage.getItem("article")) || []
-    save.splice(supprimer, 1)
+    save = save.filter(article => article.id !== id)
     localStorage.setItem("article", JSON.stringify(save))
 
+    div.remove()
 }
 
