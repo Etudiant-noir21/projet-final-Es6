@@ -114,18 +114,18 @@ modifier.addEventListener("click", () => {
 
 
 EnregistrerModif.addEventListener("click", () => {
-    const formeModifier = document.querySelector("#formeModifier");
+    const index = Array.from(listeTask.children).indexOf(div)
     formulaire.style.display = "none";
     pagePrincipale.style.display = "block";
 
-  
     // ajout des nouvelles elements
     li1.innerHTML = ` <strong>Titre:</strong> <br> ${ titreModif.value}`
     li2.innerHTML =`<strong>Contenu:</strong> <br> ${contenuModif.value}`
     li3.innerHTML =`<strong>Auteur:</strong> <br> ${auteurModif.value}`
+    
+    supprimerArticle(index)
     sauvgarderArticle(titreModif.value, contenuModif.value, auteurModif.value)
-
-    console.log(li1,li2,li3);
+  
     
 })
 
@@ -137,8 +137,10 @@ li5.appendChild(supp)
 
 // ecouter le click sur le bouton supprimer
 supp.addEventListener("click", () => {
+
+    const index = Array.from(listeTask.children).indexOf(div)
+    supprimerArticle(index)
     div.remove()
-    supprimerArticle(listeTask.children.length - 1)
 })
 
 
@@ -161,6 +163,8 @@ function sauvgarderArticle(titre,contenu,auteur){
 // fonction de recuperation 
 function recupererArticle(){
     let save = JSON.parse(localStorage.getItem("article")) || []
+
+    listeTask.innerHTML = ""
     save.forEach(article => {
         ajouterArticle(article.titre, article.contenu, article.auteur)
     });
@@ -175,7 +179,7 @@ function modifierArticle(titremodifier,contenumodifier,auteurmodifier){
 
     let index = save.findIndex(article=> article.titre === titremodifier)
 
-    if(index === -1){
+    if(index !== -1){
         save[index] ={
             titre: titremodifier,
             contenu: contenumodifier,
