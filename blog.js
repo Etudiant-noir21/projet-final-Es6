@@ -8,23 +8,25 @@ const formulaire = document.querySelector(".form");
 const titre = document.querySelector("#title");
 const contenu = document.querySelector("#content");
 const auteur = document.getElementById("author");
-console.log(auteur.value);
-
-
 const myForm = document.getElementById("formulaire");
+
+// form modifier
+const formulaireModifier = document.querySelector("#formModifier");
+const titreModif = document.querySelector("#titleModif");
+const contenuModif = document.querySelector("#contentModif");
+const auteurModif = document.getElementById("authorModif");
+const EnregistrerModif = document.querySelector("#EnregistrerModif");
+const Enregistrer = document.querySelector("#Enregistrer");
 
 
 // recuperation des elements de la page principale
 const listeTask = document.querySelector("#listeTask");
-// console.log(tbody);
-
 const AjouterBlog = document.querySelector("#AjouterBlog");
 
 // ecouter le click sur le bouton ajouter un article
 AjouterBlog.addEventListener("click", () => {
     formulaire.style.display = "block";
     pagePrincipale.style.display = "none";
-//  AjouterBlog.s
 })
 
 
@@ -40,6 +42,13 @@ formulaire.addEventListener("submit", (e) => {
     myForm.reset();
 })
 
+// form modifier
+
+
+// ecouter le click sur le bouton modifier
+EnregistrerModif.addEventListener("click", () => {
+    
+})
 // fonction pour ajouter un article
 
 function ajouterArticle(titre,contenu,auteur){
@@ -52,17 +61,17 @@ div.appendChild(li1)
 
 // titre
 
-li1.textContent = ' Titre: '+  titre
+li1.innerHTML = ` <strong>Titre:</strong> <br> ${ titre}`
 div.appendChild(li1)
 
 // contenu
 const li2 = document.createElement('li')
-li2.textContent ='Article: '+ contenu
+li2.innerHTML =`<strong>Contenu:</strong> <br> ${contenu}`
 div.appendChild(li2)
 
 // auteur
 const li3 = document.createElement('li')
-li3.textContent ='Auteurs: '+ auteur
+li3.innerHTML =`<strong>Auteur:</strong> <br> ${auteur}`
 div.appendChild(li3)
 
 // date 
@@ -76,11 +85,11 @@ const moisFrancais = [
     "juil", "août", "sept", "oct", "nov", "déc"
   ];
 
-  const moisName = moisFrancais[mois]
+const moisName = moisFrancais[mois]
 const annee = date.getFullYear()
 
 const affichage = day + '/' + moisName + '/' + annee
-li4.innerHTML ='Date publi: '+ affichage
+li4.innerHTML =`<strong>Date:</strong> <br> ${affichage}`
 div.appendChild(li4)
 
 // modifier
@@ -96,13 +105,29 @@ modifier.addEventListener("click", () => {
     const formeModifier = document.querySelector("#formeModifier");
     formulaire.style.display = "block";
     pagePrincipale.style.display = "none";
-    
+    formeModifier.style.display = "block";
+    myForm.style.display = "none";
 
     modifierArticle(titre, contenu, auteur)
 
 })
 
 
+EnregistrerModif.addEventListener("click", () => {
+    const formeModifier = document.querySelector("#formeModifier");
+    formulaire.style.display = "none";
+    pagePrincipale.style.display = "block";
+
+  
+    // ajout des nouvelles elements
+    li1.innerHTML = ` <strong>Titre:</strong> <br> ${ titreModif.value}`
+    li2.innerHTML =`<strong>Contenu:</strong> <br> ${contenuModif.value}`
+    li3.innerHTML =`<strong>Auteur:</strong> <br> ${auteurModif.value}`
+    sauvgarderArticle(titreModif.value, contenuModif.value, auteurModif.value)
+
+    console.log(li1,li2,li3);
+    
+})
 
 
 // supprimer
@@ -145,24 +170,25 @@ recupererArticle()
 
 // fonction modifier
 
-function modifierArticle(titremodif,contenumodif,auteurmodif){
+function modifierArticle(titremodifier,contenumodifier,auteurmodifier){
     let save = JSON.parse(localStorage.getItem("article")) || []
-    let article = {
-        titre: titremodif,
-        contenu: contenumodif,
-        auteur: auteurmodif
+
+    let index = save.findIndex(article=> article.titre === titremodifier)
+
+    if(index === -1){
+        save[index] ={
+            titre: titremodifier,
+            contenu: contenumodifier,
+            auteur: auteurmodifier
+        }
     }
-
-    console.log(article);
-    
-   titre.value = article.titre
-   console.log(article.titre);
    
-   contenu.value = article.contenu
-   auteur.value = article.auteur
-
-    save.splice(listeTask.children.length - 1, 1, article)
     localStorage.setItem("article", JSON.stringify(save))
+
+   titreModif.value = save[index].titre
+   contenuModif.value = save[index].contenu
+   auteurModif.value = save[index].auteur
+
 }
 
 
@@ -175,3 +201,4 @@ function supprimerArticle(supprimer){
     localStorage.setItem("article", JSON.stringify(save))
 
 }
+
