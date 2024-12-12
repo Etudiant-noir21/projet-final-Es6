@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de blog</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- fontAwesome -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+</head>
+<body>
+    <div class="content">
+        <div class="title">
+            <h1>Application de blog</h1>
+            <p>Bienvenue dans notre application de blog</p>
+        </div>
+
+        <!-- tableau -->
+        <div class="liste">
+            <ul id="listeTask">
+               
+            </ul>
+            <div class="pagination">
+                <button id="AjouterBlog">ajouter un article</button>
+            </div>
+        </div>
+
+
+        <!-- formulaire -->
+        <div class="form">
+            <h2>Ajouter un article</h2>
+            <form id="formulaire">
+                <div class="form-group">
+                    <label for="title">Titre</label>
+                    <input type="text" id="title" name="title" required placeholder="Entrez le titre de l'article">
+                </div>
+                <div class="form-group">
+                    <label for="content">Contenu</label>
+                    <textarea id="content" name="content" required placeholder="Entrez le contenu de l'article" rows="4" cols="50"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="author">Auteur</label>
+                    <input type="text" id="author" name="author" required placeholder="Entrez le nom de l'auteur">
+                </div>
+                <div class="form-group">
+                    <button id="Enregistrer" type="submit">Enregistrer</button>
+                </div>
+            </form>
+
+            <!-- modifier -->
+            <form id="formeModifier">
+                <div class="form-group">
+                    <label for="title">Titre</label>
+                    <input type="text" id="titleModif" name="title" required placeholder="Entrez le titre de l'article">
+                </div>
+                <div class="form-group">
+                    <label for="content">Contenu</label>
+                    <textarea id="contentModif" name="content" required placeholder="Entrez le contenu de l'article" rows="4" cols="50"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="author">Auteur</label>
+                    <input type="text" id="authorModif" name="author" required placeholder="Entrez le nom de l'auteur">
+                </div>
+                <div class="form-group">
+                    <button id="EnregistrerModif" type="submit">Modifier</button>
+                </div>
+            </form>
+        </div>
+                    
+    </div>
+
+    <script src="blog.js"></script>
+</body>
+</html>
