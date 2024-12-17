@@ -1,12 +1,5 @@
-// document.addEventListener('DOMContentLoaded', () => {
-//     recupererArticle();
-// });
-
-
 // recupwration de mes donnes sur le dom
-
 const pagePrincipale = document.querySelector(".liste");
-
 const formulaire = document.querySelector(".form");
 
 // recuperation des elements du formulaire
@@ -17,7 +10,6 @@ const myForm = document.getElementById("formulaire");
 
 // form modifier
 const formulaireModifier = document.querySelector("#formeModifier");
-console.log(formulaireModifier);
 
 const titreModif = document.querySelector("#titleModif");
 const contenuModif = document.querySelector("#contentModif");
@@ -42,7 +34,6 @@ AjouterBlog.addEventListener("click", () => {
     
 })
 
-
 // ecouter le l'envoie du formulaire
 formulaire.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -57,11 +48,21 @@ formulaire.addEventListener("submit", (e) => {
 
 // sauvegarder article
 function sauvgarderArticle(titr, cont, aut) {
+
+    const date = new Date().toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+
+    })
     let donnes = {
         id: Date.now(),
        titre: titr,
        contenu: cont,
-       auteur: aut
+       auteur: aut,
+       date: date
     }
  
     let save = JSON.parse(localStorage.getItem('article')) || []
@@ -81,14 +82,12 @@ function sauvgarderArticle(titr, cont, aut) {
      }
  
      save.forEach(element => {
-         ajouterArticle(element.titr, element.cont, element.aut)
+         ajouterArticle(element.titre, element.contenu, element.auteur,element.id,element.date)
      })
  }
 
 // fonction pour ajouter un article
-function ajouterArticle(titr, cont, aut) {
-console.log('titr', titr, 'cont', cont, 'aut', aut);
-// creation d'element d'affichage
+function ajouterArticle(titr, cont, aut,id,date) {
 const items_content = document.createElement('div')
 listeTask.appendChild(items_content)
 items_content.classList.add('items') //div conteneur
@@ -99,9 +98,8 @@ items_content.appendChild(itemText)
 const item_titre = document.createElement('input')
 item_titre.type = 'text'
 item_titre.classList.add('text')
-item_titre.value = titr
+item_titre.value =`TITRE:  ${titr}` 
 item_titre.setAttribute('readonly', 'readonly')
-// console.log(item_titre.value);
 itemText.appendChild(item_titre)
 
 const edit_titre = document.createElement('button')
@@ -120,17 +118,21 @@ edit_titre.addEventListener('click', (e)=>{
     }else{
         edit_titre.innerHTML = 'Edit'
         item_titre.setAttribute('readonly', 'readonly')
-        misAJour(titr, cont, aut)
+        misAJour(id,"titre", item_titre.value)
+
+        console.log(item_titre.value);
+        
     }
 })
 
 // partie contenu
 const itemTextContenu = document.createElement('li')//li  contenu
 items_content.appendChild(itemTextContenu)
-const item_Contenu = document.createElement('input')
+const item_Contenu = document.createElement('textarea')
 item_Contenu.type = 'text'
+item_Contenu.rows = '10'
 item_Contenu.classList.add('text')
-item_Contenu.value = cont
+item_Contenu.value = `CONTENU : ${cont}`
 item_Contenu.setAttribute('readonly', 'readonly')
 itemTextContenu.appendChild(item_Contenu)
 
@@ -150,7 +152,8 @@ edit_contenu.addEventListener('click', (e)=>{
     }else{
         edit_contenu.innerHTML = 'Edit'
         item_Contenu.setAttribute('readonly', 'readonly')
-        misAJour(titr, cont, aut)
+        misAJour(id,"contenu",item_Contenu.value)
+        console.log(item_Contenu.value)
     }
 })
 
@@ -160,7 +163,7 @@ items_content.appendChild(itemTextAuteur)
 const item_Auteur = document.createElement('input')
 item_Auteur.type = 'text'
 item_Auteur.classList.add('text')
-item_Auteur.value = aut
+item_Auteur.value = `AUTEUR : ${aut}` 
 item_Auteur.setAttribute('readonly', 'readonly')
 itemTextAuteur.appendChild(item_Auteur)
 
@@ -180,31 +183,23 @@ edit_Auteur.addEventListener('click', (e)=>{
     }else{
         edit_Auteur.innerHTML = 'Edit'
         item_Auteur.setAttribute('readonly', 'readonly')
-        misAJour(id,titr, cont, aut)
+        misAJour(id,"auteur", item_Auteur.value)
+
+       console.log(item_Auteur.value);
+        
     }
 })
-
-// affichage date de publication
-const date = new Date()
-const affichage = date.toLocaleDateString('fr-FR',{
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-})
-console.log(affichage);
 
 const itemTextDate = document.createElement('li')//li  date
 items_content.appendChild(itemTextDate)
 const item_date = document.createElement('input')
 item_date.type = 'text'
 item_date.classList.add('text')
-item_date.value = affichage
+item_date.value = `DATE PUBLICATION: ${date}`
 item_date.setAttribute('readonly', 'readonly')
 itemTextDate.appendChild(item_date)
 
+// button supprimer
 const supp = document.createElement('button')
 supp.type = 'button'
 supp.classList.add('supp')
@@ -214,35 +209,34 @@ itemTextDate.appendChild(supp)
 
 supp.addEventListener('click', (e)=>{
     items_content.remove()
-    supprimerArticle(titr)
+    supprimerArticle(id)
 })
 }
 
-// fonction modifier
-function misAJour(id,newTitre, newContenu, newAuteur){
+// fonction mis a jour
+function misAJour(id,champ, newValue){
     let save = JSON.parse(localStorage.getItem('article')) || []
-    save = save.map(article => {
-        if (article.id === id) {
+    
+    save = save.map(article=> {
+
+        if(article.id === id){
             return {
-                ...article, 
-                titre: newTitre,
-                contenu: newContenu,
-                auteur: newAuteur
-            };
+              ...article,
+              [champ]: newValue,  //mettre a jour un champ specifique
+            }
+           
         }
-        return article;
-    });
+
+        return article
+    })
+    localStorage.setItem('article', JSON.stringify(save))
 
     }
    
 // fonction supprimer
-function supprimerArticle(eleSupp){
+function supprimerArticle(id){
     let save = JSON.parse(localStorage.getItem('article')) || []
-    save.forEach((element, index) => {
-        if(element.titr == eleSupp){
-            save.splice(index, 1)
-        }
-    });
+    save = save.filter(article => article.id !==id);
     localStorage.setItem('article', JSON.stringify(save))
    
 }
